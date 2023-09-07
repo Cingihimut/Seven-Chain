@@ -64,12 +64,6 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
      * - `balanceOf(msg.sender) >= burnAmount`.
      * - `burnAmount % 1000 == 0`.
      * 
-     * -This function will be used to mint 100 new tokens for every 1000 burned tokens,
-     * and it applies to multiples of 1000 tokens.
-     * 
-     * -For example, if 1000 tokens are burned, then 100 new tokens will be minted.
-     * If 2000 tokens are burned, then 200 new tokens will be minted.
-     * However, if 1500 tokens are burned, then only 100 new tokens will be minted.
      */
 
     function burnAndMint(uint256 burnAmount) public {

@@ -1108,7 +1108,6 @@ library SafeMath {
 // contracts/SevenChain
 
 pragma solidity ^0.8.19;
-// @author singgih brilian tara
 contract SevenChain is ERC20, Ownable, ERC20Burnable {
     using SafeMath for uint256;
     using Address for address;

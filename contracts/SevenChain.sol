@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
-// @author singgih brilian tara
 contract SevenChain is ERC20, Ownable, ERC20Burnable {
     using SafeMath for uint256;
     using Address for address;

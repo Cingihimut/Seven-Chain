@@ -9,27 +9,22 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
 // @author singgih brilian tara
-contract SevenChain is ERC20, Ownable, ERC20Burnable, AccessControl {
+contract SevenChain is ERC20, Ownable, ERC20Burnable {
     using SafeMath for uint256;
     using Address for address;
-
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     event TokenBurned(address indexed burner, uint256 amount);
     event TokenMinted(address indexed minter, uint256 amount);
 
     constructor() ERC20("Seven Chain", "Sc") {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, msg.sender);
-        _mint(msg.sender, 40000000000 * 10 ** uint256(decimals()));
+        _mint(msg.sender, 400000000 * 10 ** uint256(decimals()));
     }
 
-    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+    function mint(address to, uint256 amount) public {
         require(
-            totalSupply() + amount <= 40000000000 * 10 ** uint256(decimals())
+            totalSupply() + amount <= 400000000 * 10 ** uint256(decimals())
         );
         _mint(to, amount);
         emit TokenMinted(to, amount);

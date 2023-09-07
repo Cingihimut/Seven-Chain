@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.19;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -18,9 +17,20 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
     event TokenBurned(address indexed burner, uint256 amount);
     event TokenMinted(address indexed minter, uint256 amount);
 
+    uint256 public totalBurnedTokens;
+    uint256 public mintingThreshold = 1000 *10 *uint256(decimals());
+
     constructor() ERC20("Seven Chain", "Sc") {
         _mint(msg.sender, 400000000 * 10 ** uint256(decimals()));
     }
+
+    /**
+     * @dev Mints `amount` tokens to `to`.
+     *
+     * Requirements:
+     *
+     * - `totalSupply() + amount <= _cap`.
+     */
 
     function mint(address to, uint256 amount) public {
         require(
@@ -29,6 +39,14 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
         _mint(to, amount);
         emit TokenMinted(to, amount);
     }
+
+    /**
+     * @dev Burns `amount` tokens from `msg.sender`.
+     *
+     * Requirements:
+     *
+     * - `balanceOf(msg.sender) >= amount`.
+     */
 
     function burnTokens(uint256 amount) public onlyOwner {
         require(
@@ -39,11 +57,37 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
         emit TokenBurned(msg.sender, amount);
     }
 
-    function withdraw(uint256 amount) public {
-        require(
-            address(this).balance >= amount,
-            "Insufficient balance in the contract"
-        );
-        payable(owner()).transfer(amount);
+    /**
+     * @dev Burns `burnAmount` tokens and mints `mintAmount` tokens to the sender.
+     *
+     * Requirements:
+     *
+     * - `balanceOf(msg.sender) >= burnAmount`.
+     * - `burnAmount % 1000 == 0`.
+     * 
+     * -This function will be used to mint 100 new tokens for every 1000 burned tokens,
+     * and it applies to multiples of 1000 tokens.
+     * 
+     * -For example, if 1000 tokens are burned, then 100 new tokens will be minted.
+     * If 2000 tokens are burned, then 200 new tokens will be minted.
+     * However, if 1500 tokens are burned, then only 100 new tokens will be minted.
+     */
+
+    function burnAndMint(uint256 burnAmount) public {
+        require(balanceOf(msg.sender) >= burnAmount, "Insufficient balances to burn");
+
+        require(burnAmount % 1000 == 0, "Burn amount must be multiple of 1000");
+
+        _burn(msg.sender, burnAmount);
+
+        totalBurnedTokens = totalBurnedTokens.add(burnAmount);
+
+        if (totalBurnedTokens >= mintingThreshold) {
+            uint256 mintAmount = totalBurnedTokens.div(mintingThreshold)* 100;
+
+            _mint(msg.sender, mintAmount);
+
+            totalBurnedTokens = totalBurnedTokens % mintingThreshold;
+        }
     }
 }

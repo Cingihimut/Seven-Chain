@@ -8,10 +8,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract SevenChain is ERC20, Ownable, ERC20Burnable {
+contract SevenChain is ERC20, Ownable, ERC20Burnable, AccessControl {
     using SafeMath for uint256;
     using Address for address;
+
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     event TokenBurned(address indexed burner, uint256 amount);
     event TokenMinted(address indexed minter, uint256 amount);
@@ -20,7 +23,14 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
     uint256 public mintingThreshold = 1000 *10 *uint256(decimals());
 
     constructor() ERC20("Seven Chain", "Sc") {
-        _mint(msg.sender, 400000000 * 10 ** uint256(decimals()));
+        _mint(msg.sender, 4000000000 * 10 ** uint256(decimals()));
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender); 
+    }
+
+    modifier onlyMinter() {
+        require(hasRole(MINTER_ROLE, msg.sender), "Must have MINTER_ROLE to mint");
+        _;
     }
 
     /**
@@ -31,9 +41,9 @@ contract SevenChain is ERC20, Ownable, ERC20Burnable {
      * - `totalSupply() + amount <= _cap`.
      */
 
-    function mint(address to, uint256 amount) public {
+    function mint(address to, uint256 amount) public onlyMinter{
         require(
-            totalSupply() + amount <= 400000000 * 10 ** uint256(decimals())
+            totalSupply() + amount <= 4000000000 * 10 ** uint256(decimals())
         );
         _mint(to, amount);
         emit TokenMinted(to, amount);

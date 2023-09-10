@@ -5,18 +5,26 @@ require("@nomicfoundation/hardhat-verify");
 require("dotenv").config();
 const private_key = process.env.PRIVATE_KEY;
 const infura_api_key = process.env.INFURA_API_KEY;
+const etherscan_api_key = process.env.ETHERSCAN_API_KEY;
+const mnemonic = process.env.MNEMONIC;
+
+// console.log("PRIVATE_KEY:", private_key);
+// console.log("INFURA_API_KEY:", infura_api_key);
+// console.log("ETHERSCAN_API_KEY:", etherscan_api_key);
+// console.log("MNEMONIC:", mnemonic);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  defaultNetwork: "sepolia",
   networks: {
     hardhat: {
     },
     sepolia: {
-      url: `https://sepolia.infura.io/v3/${infura_api_key}`,
+      url: infura_api_key,
       accounts: [private_key],
       chainId: 11155111,
+      mnemonic: mnemonic
     },
   },
-  solidity: "0.8.19"
+  solidity: "0.8.19",
+  etherscan: etherscan_api_key
 };
